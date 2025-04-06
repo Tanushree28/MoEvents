@@ -1,0 +1,39 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+*.env
+
+# FastAPI-specific
+.db/
+
+# IDEs
+.vscode/
+.idea/
+
+# MacOS
+.DS_Store
+
+# Logs
+*.log
+
+# Coverage
+.coverage
+*.coverage
+.tox/
+.nox/
+.coverage.*
+.pytest_cache/
+nosetests.xml
+test_*.xml
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
