@@ -5,7 +5,7 @@ CREATE DATABASE IF NOT EXISTS moevents_db;
 USE moevents_db;
 
 -- Create Users table
-CREATE TABLE IF NOT EXISTS Users (
+CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 -- Create Events table
-CREATE TABLE IF NOT EXISTS Events (
+CREATE TABLE IF NOT EXISTS events (
     event_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
@@ -24,11 +24,11 @@ CREATE TABLE IF NOT EXISTS Events (
     time TIME NOT NULL,
     location VARCHAR(255) NOT NULL,
     created_by INT,
-    FOREIGN KEY (created_by) REFERENCES Users(user_id)
+    FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
 
 -- Create Registrations table
-CREATE TABLE IF NOT EXISTS Registrations (
+CREATE TABLE IF NOT EXISTS registrations (
     registration_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     event_id INT,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Registrations (
 );
 
 -- Create Feedback table
-CREATE TABLE IF NOT EXISTS Feedback (
+CREATE TABLE IF NOT EXISTS feedbacks (
     feedback_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     event_id INT,

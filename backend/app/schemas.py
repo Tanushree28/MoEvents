@@ -1,8 +1,7 @@
 # backend/app/schemas.py
 
 from pydantic import BaseModel
-from typing import Optional
-from datetime import date, time
+from datetime import date as _date, time as _time
 
 
 class EventBase(BaseModel):
@@ -10,8 +9,8 @@ class EventBase(BaseModel):
     description: str
     event_type: str
     department: str
-    date: date
-    time: time
+    date: _date
+    time: _time
     location: str
 
 
@@ -19,9 +18,19 @@ class EventCreate(EventBase):
     created_by: int
 
 
-class EventOut(EventBase):
+class EventUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    event_type: str | None = None
+    department: str | None = None
+    date: _date | None = None
+    time: _time | None = None
+    location: str | None = None
+
+
+class EventRead(EventBase):
     event_id: int
-    created_by: Optional[int]
+    created_by: int | None = None
 
     class Config:
         orm_mode = True
