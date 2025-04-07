@@ -1,5 +1,3 @@
-# backend/app/models.py
-
 from sqlalchemy import Column, Integer, String, Text, Enum, Date, Time, ForeignKey
 from .database import Base
 import enum

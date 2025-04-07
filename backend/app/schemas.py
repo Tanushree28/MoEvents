@@ -1,5 +1,3 @@
-# backend/app/schemas.py
-
 from pydantic import BaseModel
 from datetime import date as _date, time as _time
 
@@ -34,3 +32,26 @@ class EventRead(EventBase):
 
     class Config:
         orm_mode = True
+
+class EventDelete(BaseModel):
+    event_id: int
+    deleted: bool = True
+
+    class Config:
+        orm_mode = True
+
+class RegistrationBase(BaseModel):
+    user_id: int
+    event_id: int
+
+class RegistrationCreate(RegistrationBase):
+    pass
+
+class RegistrationRead(RegistrationBase):
+    registration_id: int
+
+    class Config:
+        orm_mode = True
+
+
+

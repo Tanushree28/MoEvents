@@ -1,15 +1,16 @@
-# backend/app/crud.py
 import logging
 from fastapi import HTTPException, status
 from pymysql import DatabaseError
 from sqlalchemy.orm import Session
 
 from backend.app.schemas import EventCreate, EventRead, EventUpdate
+from backend.app.models import Registration
+from backend.app.schemas import RegistrationCreate
 from .models import Event
 
 logger = logging.getLogger(__name__)
 
-
+# EVENTS CRUD operations
 def create_event(db: Session, event: EventCreate):
     try:
         event = Event(
@@ -67,3 +68,51 @@ def update_event_by_id(db: Session, id: int, event_update: EventUpdate) -> Event
     except DatabaseError as e:
         logger.error(f"Error updating event: {e}")
         raise
+
+
+def delete_event_by_id(db: Session, id: int) -> EventRead:
+    try:
+        event = get_event_by_id(db, id)
+        db.delete(event)
+        db.commit()
+        return event
+    except DatabaseError as e:
+        logger.error(f"Error deleting event: {e}")
+        raise e
+    
+# Registration CRUD operations
+
+def create_registration(db: Session, registration: RegistrationCreate):
+    try:
+        registration = Registration(
+            event_id=registration.event_id,
+            user_id=registration.user_id,
+            status=registration.status,
+        )
+        db.add(registration)
+        db.commit()
+        db.refresh(registration)
+
+        return registration
+    except DatabaseError as e:
+        logger.error(f"Error creating registration: {e}")
+        raise e
+
+def get_all_registrations(db: Session):
+    return db.query(Registration).all()
+
+def get_registration_by_id(db: Session, id: int) -> Registration:
+    try:
+        registration = db.query(Registration).filter(Registration.registration_id == id).first()
+        if not registration:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found"
+            )
+
+        return registration
+    except DatabaseError as e:
+        logger.error(f"Error updating registration: {e}")
+        raise
+
+
+

@@ -1,5 +1,3 @@
-# backend/app/routers/events.py
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from .. import schemas, crud
@@ -29,3 +27,7 @@ def get_event_by_id(id: int, db: Session = Depends(get_db)):
 @router.put("/{id}", response_model=schemas.EventRead)
 def update_event(id: int, event: schemas.EventUpdate, db: Session = Depends(get_db)):
     return crud.update_event_by_id(db, id, event)
+
+@router.delete("/{id}", response_model=schemas.EventRead)
+def delete_event(id: int, db: Session = Depends(get_db)):
+    return crud.delete_event_by_id(db, id)
