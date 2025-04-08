@@ -37,3 +37,9 @@ test_*.xml
 *.bak
 *.swp
 *.swo
+
+# React
+node_modules/
+build/
+dist/
+*.tgz

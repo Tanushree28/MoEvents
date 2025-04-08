@@ -120,7 +120,6 @@ def get_registration_by_id(db: Session, id: int) -> Registration:
 
 
 # Login
-
 def create_user(db: Session, user: UserCreate):
     hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
     db_user = User(username=user.username, hashed_password=hashed_password, email=user.email)

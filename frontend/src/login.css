@@ -1,0 +1,86 @@
+/* Common styles for body */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #3B3B3B;
+    background-color: #f0f0f0;
+}
+
+/* Styles for login page */
+.auth-page {
+    background: url('./assets/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 500px; 
+}
+
+.login-container img {
+    width: 100%;
+    max-width: 100;
+    height: 40;
+    margin-bottom: 20px;
+}
+
+.login-container h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.login-container input[type="submit"] {
+    background-color: #d71921;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.login-container input[type="submit"]:hover {
+    background-color: #c7161e;
+}
+
+.login-container a {
+    color: #d71921;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.login-container a:hover {
+    text-decoration: underline;
+}
+
+/* Footer styles */
+.login-footer {
+    margin-top: auto; /* Pushes footer to the bottom */
+    font-size: 12px;
+    color: #333;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}
