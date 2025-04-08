@@ -2,10 +2,13 @@ import logging
 from fastapi import HTTPException, status
 from pymysql import DatabaseError
 from sqlalchemy.orm import Session
+import bcrypt
 
 from backend.app.schemas import EventCreate, EventRead, EventUpdate
 from backend.app.models import Registration
 from backend.app.schemas import RegistrationCreate
+from backend.app.models import User
+from .schemas import UserCreate
 from .models import Event
 
 logger = logging.getLogger(__name__)
@@ -116,3 +119,18 @@ def get_registration_by_id(db: Session, id: int) -> Registration:
 
 
 
+# Login
+
+def create_user(db: Session, user: UserCreate):
+    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
+    db_user = User(username=user.username, hashed_password=hashed_password, email=user.email)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+def verify_password(plain_password, hashed_password):
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))

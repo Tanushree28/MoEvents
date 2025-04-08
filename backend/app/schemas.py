@@ -1,6 +1,20 @@
 from pydantic import BaseModel
 from datetime import date as _date, time as _time
 
+class UserBase(BaseModel):
+    username: str
+    email: str
+
+class UserCreate(UserBase):
+    password: str
+
+class UserRead(UserBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+class TokenData(BaseModel):
+    username: str | None = None
 
 class EventBase(BaseModel):
     title: str
@@ -52,6 +66,4 @@ class RegistrationRead(RegistrationBase):
 
     class Config:
         orm_mode = True
-
-
 
