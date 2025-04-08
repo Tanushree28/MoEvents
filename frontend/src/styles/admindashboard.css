@@ -1,0 +1,107 @@
+/* General Page Styling */
+.admin-dashboard {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header */
+  .admin-header {
+    background-color: #d71921;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .admin-header h1 {
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .header-buttons button {
+    background-color: white;
+    color: #d71921;
+    border: 2px solid white;
+    padding: 10px 16px;
+    margin-left: 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .header-buttons button:hover {
+    background-color: #c7161e;
+    color: white;
+    border: 2px solid #c7161e;
+  }
+  
+  /* Charts Section */
+  .dashboard-visuals {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 30px 40px;
+    gap: 30px;
+  }
+  
+  .chart-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    flex: 1;
+    min-width: 300px;
+    max-width: 600px;
+  }
+  
+  /* Upcoming Events Panel */
+  .upcoming-events {
+    margin: 30px 40px;
+  }
+  
+  .upcoming-events h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .event-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 10px;
+  }
+  
+  .event-card {
+    min-width: 200px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  
+  .event-card h3 {
+    color: #d71921;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  
+  .event-card p {
+    font-size: 14px;
+  }
+  
+  /* Footer */
+  .admin-footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: auto;
+    font-size: 14px;
+  }
+  
