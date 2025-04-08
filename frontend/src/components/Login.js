@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../login.css';
-import logo from '../assets/logo.png';
+import logow from '../assets/logo.png';
 
 function Login() {
     // State hooks for form data
@@ -19,8 +19,8 @@ function Login() {
     return (
       <div className="auth-page">
         <div className="login-container">
-        <img src={logo} alt="Logo" className="logo" />
-          <h1>Login to MoEvents</h1>
+        <img src={logow} alt="Logo" className="logo" />
+          <h1>MoEvents</h1>
           <form onSubmit={handleSubmit}>
             <div>
               <input
@@ -41,7 +41,7 @@ function Login() {
               />
             </div>
             <div>
-              <input type="submit" value="Login" className="form-submit" />
+              <input type="submit" value="Sign In" className="form-submit" />
             </div>
           </form>
           <p>Forgot Password? <a href="/forgot-password">Click Here</a></p>

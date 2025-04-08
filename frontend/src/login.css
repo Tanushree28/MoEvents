@@ -22,7 +22,7 @@ body {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
+    width: 350px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -60,6 +60,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
+    position: relative;
 }
 
 .login-container input[type="submit"]:hover {
