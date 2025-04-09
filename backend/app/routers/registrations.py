@@ -19,3 +19,11 @@ def get_all_registrations(db: Session = Depends(get_db)):
 @router.get("/{id}", response_model=schemas.RegistrationCreate)
 def get_registration_by_id(id: int, db: Session = Depends(get_db)):
     return crud.get_registration_by_id(db, id) 
+
+# User Register for an event API
+@router.post("/user_event", response_model=schemas.UserRegisterEvent)
+def register_user_for_event(
+    registration: schemas.UserRegisterEvent,
+    db: Session = Depends(get_db),
+):
+    return crud.register_user_for_event(db, registration.user_id, registration.event_id)

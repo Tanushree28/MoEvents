@@ -133,3 +133,13 @@ def get_user_by_username(db: Session, username: str):
 
 def verify_password(plain_password, hashed_password):
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+
+# User Register for an event API crud
+def register_user_for_event(db: Session, user_id: int, event_id: int):
+    registration = Registration(user_id=user_id, event_id=event_id)
+    db.add(registration)
+    db.commit()
+    db.refresh(registration)
+    return registration
+

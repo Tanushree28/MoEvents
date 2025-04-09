@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date as _date, time as _time
+from typing import Optional
 
 class UserBase(BaseModel):
     username: str
@@ -27,7 +28,8 @@ class EventBase(BaseModel):
 
 
 class EventCreate(EventBase):
-    created_by: int
+    # created_by: int
+    created_by: Optional[int] = None
 
 
 class EventUpdate(BaseModel):
@@ -63,6 +65,14 @@ class RegistrationCreate(RegistrationBase):
 
 class RegistrationRead(RegistrationBase):
     registration_id: int
+
+    class Config:
+        orm_mode = True
+
+# User Register for an event API schema
+class UserRegisterEvent(BaseModel):
+    event_id: int
+    user_id: int
 
     class Config:
         orm_mode = True

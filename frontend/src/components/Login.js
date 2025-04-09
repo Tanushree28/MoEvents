@@ -6,7 +6,7 @@ import logow from '../assets/logo.png';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate(); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
