@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import logging
 from fastapi import HTTPException, status
 from pydantic import ValidationError, validate_email
@@ -7,7 +8,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import bcrypt
 
 from backend.app.schemas import EventCreate, EventRead, EventUpdate, UserCreate
-from backend.app.models import Event, Registration
+from backend.app.models import Event, Registration, TokenBlacList
 from backend.app.schemas import RegistrationCreate
 from backend.app.models import User
 
@@ -203,3 +204,22 @@ def register_user_for_event(db: Session, user_id: int, event_id: int):
     db.commit()
     db.refresh(registration)
     return registration
+
+
+################################
+######## Token blacklist #######
+################################
+def revoke_jti(db: Session, jti: str, expires_at: datetime):
+    db.merge(TokenBlacList(jti=jti, expires_at=expires_at))
+    db.commit()
+
+
+def is_jti_revoked(db: Session, jti: str) -> bool:
+    return db.query(TokenBlacList).filter(TokenBlacList.jti == jti).first() is not None
+
+
+def prune_expired_jtis(db: Session):
+    db.query(TokenBlacList).filter(
+        TokenBlacList.expires_at < datetime.now(timezone.utc)
+    ).delete(synchronize_session=False)
+    db.commit()

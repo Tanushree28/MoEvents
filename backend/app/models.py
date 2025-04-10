@@ -1,4 +1,15 @@
-from sqlalchemy import Column, Integer, String, Text, Enum, Date, Time, ForeignKey
+from datetime import datetime, timezone
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Integer,
+    String,
+    Text,
+    Enum,
+    Date,
+    Time,
+    ForeignKey,
+)
 from .database import Base
 import enum
 
@@ -49,3 +60,11 @@ class Feedback(Base):
     event_id = Column(Integer, ForeignKey("events.event_id"))
     rating = Column(Integer)
     comment = Column(Text)
+
+
+class TokenBlacList(Base):
+    __tablename__ = "token_blacklists"
+
+    jti = Column(String(36), primary_key=True, index=True)
+    expires_at = Column(DateTime, nullable=False, index=True)
+    revoked_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))

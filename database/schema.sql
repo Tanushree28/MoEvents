@@ -47,3 +47,11 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (event_id) REFERENCES Events(event_id)
 );
+
+-- Create token_blacklist table
+CREATE TABLE IF NOT EXISTS token_blacklists (
+    jti VARCHAR(36) NOT NULL PRIMARY KEY,
+    expires_at DATETIME NOT NULL,
+    revoked_at DATETIME NOT NULL,
+    INDEX idx_expires_at (expires_at)
+)

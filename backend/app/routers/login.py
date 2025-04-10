@@ -3,16 +3,15 @@ from sqlalchemy.orm import Session
 
 from backend.app import schemas, crud
 from backend.app.database import get_db
-from backend.app.login.login import authenticate_user
-from backend.app.middleware import get_current_user
-
+from backend.app.middleware import get_current_user, oauth2_scheme
+from backend.app.services.token_service import TokenService
 
 router = APIRouter(prefix="/auth", tags=["Login"])
 
 
 @router.post("/login", response_model=schemas.LoginResponse)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
-    token = authenticate_user(user, db)
+    token = TokenService.authenticate_user(user, db)
     return {"token": token, "type": "bearer"}
 
 
@@ -23,8 +22,12 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/logout")
-def logout():
-    # Invalidate the token (you can implement token blacklist logic here)
+def logout(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    print(token)
+    TokenService.revoke_token(token, db)
     return {"message": "Logged out successfully"}
 
 

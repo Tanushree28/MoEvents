@@ -39,7 +39,7 @@ class UserRead(UserBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TokenData(BaseModel):
@@ -81,7 +81,7 @@ class EventRead(EventBase):
     created_by: int | None = None
 
     class Config:
-        orm_mode = True
+        from_atributes = True
 
 
 class EventDelete(BaseModel):
@@ -89,7 +89,7 @@ class EventDelete(BaseModel):
     deleted: bool = True
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RegistrationBase(BaseModel):
@@ -105,7 +105,7 @@ class RegistrationRead(RegistrationBase):
     registration_id: int
 
     class Config:
-        orm_mode = True
+        from_atrributes = True
 
 
 # User Register for an event API schema
@@ -114,4 +114,4 @@ class UserRegisterEvent(BaseModel):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

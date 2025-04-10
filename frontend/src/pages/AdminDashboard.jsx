@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/admindashboard.css";
+import { useAuth } from "../contexts/AuthContext";
 
 function AdminDashboard() {
   const [showCreateEventForm, setShowCreateEventForm] = useState(false);
@@ -12,6 +13,8 @@ function AdminDashboard() {
   const [eventLocation, setEventLocation] = useState("");
   const [eventId, setEventId] = useState(1);
   const [createdBy, setCreatedBy] = useState(0);
+
+  const { logout } = useAuth();
 
   const upcomingEvents = [
     {
@@ -55,8 +58,6 @@ function AdminDashboard() {
       created_by: createdBy,
     };
 
-    console.log("Event Data to be sent:", newEvent);
-
     try {
       const response = await fetch("http://127.0.0.1:8000/events", {
         method: "POST",
@@ -95,6 +96,13 @@ function AdminDashboard() {
     <div className="admin-dashboard">
       <header className="dashboard-header">
         <h1>MoEvents Admin Panel</h1>
+        <button
+          onClick={logout}
+          type="button"
+          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+        >
+          Logout
+        </button>
         <nav className="dashboard-nav">
           <button onClick={() => setShowCreateEventForm(true)}>
             Create Event

@@ -1,17 +1,17 @@
 import os
-from fastapi import HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 import jwt
-from fastapi import Depends
-from .schemas import TokenData
-from backend.app.login.login import ALGORITHM
 
+from fastapi import HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordBearer
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/token")
+from backend.app.schemas import TokenData
+
 SECRET_KEY = os.getenv("SECRET_KEY", "")
+ALGORITHM = os.getenv("ALGORITHM", "")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

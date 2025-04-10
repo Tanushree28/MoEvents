@@ -1,5 +1,6 @@
 // src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
+import useApi from "../hooks/useApi";
 
 const AuthContext = createContext({
   isAuthenticated: false,
@@ -9,6 +10,9 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { fetchData: logoutApi } = useApi("/auth/logout", "post", {
+    immediate: false,
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,9 +24,14 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      await logoutApi();
+      localStorage.removeItem("token");
+      setIsAuthenticated(false);
+    } catch (err) {
+      console.error("Logout API call failed", error);
+    }
   };
 
   return (
