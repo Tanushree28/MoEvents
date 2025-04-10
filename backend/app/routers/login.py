@@ -1,25 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from .. import schemas, crud
-from ..database import get_db
-from ..login.login import create_access_token
-from fastapi import Depends
-from ..middleware import get_current_user
 
-router = APIRouter(prefix="/login", tags=["Login"])
+from backend.app import schemas, crud
+from backend.app.database import get_db
+from backend.app.login.login import authenticate_user
+from backend.app.middleware import get_current_user
 
-@router.post("/token", response_model=schemas.TokenData)
 
-def login(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_username(db, user.username)
-    if not db_user or not crud.verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token = create_access_token(data={"sub": db_user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+router = APIRouter(prefix="/auth", tags=["Login"])
+
+
+@router.post("/login", response_model=schemas.LoginResponse)
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    token = authenticate_user(user, db)
+    return {"token": token, "type": "bearer"}
+
+
+@router.post("/signup", response_model=schemas.UserBase)
+def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    user = crud.create_user(db, user)
+    return {"username": user.name, "email": user.email}
 
 
 @router.post("/logout")
