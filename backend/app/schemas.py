@@ -1,55 +1,21 @@
-from fastapi import HTTPException, status
-from pydantic import BaseModel, EmailStr, field_validator, validate_email
+from pydantic import BaseModel
 from datetime import date as _date, time as _time
 from typing import Optional
 
-
 class UserBase(BaseModel):
     username: str
-    email: EmailStr
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-    @field_validator("username")
-    def validate_user_or_email(cls, value):
-        # If not '@' then it is plain username
-        if "@" not in value:
-            return value
-
-        # If '@' is present then is email
-        try:
-            validate_email(value)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email format"
-            )
-
-        return value
-
+    email: str
 
 class UserCreate(UserBase):
     password: str
-    verify_password: str
-
 
 class UserRead(UserBase):
     id: int
 
     class Config:
         orm_mode = True
-
-
 class TokenData(BaseModel):
     username: str | None = None
-
-
-class LoginResponse(BaseModel):
-    token: str
-    type: str
-
 
 class EventBase(BaseModel):
     title: str
@@ -83,7 +49,6 @@ class EventRead(EventBase):
     class Config:
         orm_mode = True
 
-
 class EventDelete(BaseModel):
     event_id: int
     deleted: bool = True
@@ -91,22 +56,18 @@ class EventDelete(BaseModel):
     class Config:
         orm_mode = True
 
-
 class RegistrationBase(BaseModel):
     user_id: int
     event_id: int
 
-
 class RegistrationCreate(RegistrationBase):
     pass
-
 
 class RegistrationRead(RegistrationBase):
     registration_id: int
 
     class Config:
         orm_mode = True
-
 
 # User Register for an event API schema
 class UserRegisterEvent(BaseModel):
@@ -115,3 +76,4 @@ class UserRegisterEvent(BaseModel):
 
     class Config:
         orm_mode = True
+

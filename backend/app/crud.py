@@ -1,18 +1,17 @@
 import logging
 from fastapi import HTTPException, status
-from pydantic import ValidationError, validate_email
 from pymysql import DatabaseError
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import bcrypt
 
-from backend.app.schemas import EventCreate, EventRead, EventUpdate, UserCreate
-from backend.app.models import Event, Registration
+from backend.app.schemas import EventCreate, EventRead, EventUpdate
+from backend.app.models import Registration
 from backend.app.schemas import RegistrationCreate
 from backend.app.models import User
+from .schemas import UserCreate
+from .models import Event
 
 logger = logging.getLogger(__name__)
-
 
 # EVENTS CRUD operations
 def create_event(db: Session, event: EventCreate):
@@ -83,16 +82,15 @@ def delete_event_by_id(db: Session, id: int) -> EventRead:
     except DatabaseError as e:
         logger.error(f"Error deleting event: {e}")
         raise e
-
-
+    
 # Registration CRUD operations
-
 
 def create_registration(db: Session, registration: RegistrationCreate):
     try:
         registration = Registration(
             event_id=registration.event_id,
             user_id=registration.user_id,
+            status=registration.status,
         )
         db.add(registration)
         db.commit()
@@ -103,16 +101,12 @@ def create_registration(db: Session, registration: RegistrationCreate):
         logger.error(f"Error creating registration: {e}")
         raise e
 
-
 def get_all_registrations(db: Session):
     return db.query(Registration).all()
 
-
 def get_registration_by_id(db: Session, id: int) -> Registration:
     try:
-        registration = (
-            db.query(Registration).filter(Registration.registration_id == id).first()
-        )
+        registration = db.query(Registration).filter(Registration.registration_id == id).first()
         if not registration:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found"
@@ -124,76 +118,21 @@ def get_registration_by_id(db: Session, id: int) -> Registration:
         raise
 
 
+
 # Login
 def create_user(db: Session, user: UserCreate):
-    try:
-        # Normalize inputs
-        username = user.username.strip().lower()
+    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
+    db_user = User(username=user.username, hashed_password=hashed_password, email=user.email)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
-        # Checking for user existence
-        if db.query(User).filter_by(name=username).first():
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Username already exists"
-            )
-
-        # Check if email exists
-        if db.query(User).filter_by(email=user.email).first():
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Email already exists"
-            )
-
-        # Hash the password
-        hashed_password = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt())
-
-        # Create user record
-        db_user = User(
-            name=user.username,
-            password=hashed_password.decode("utf-8"),
-            email=user.email,
-            role="student",
-        )
-        db.add(db_user)
-        db.commit()
-        db.refresh(db_user)
-        return db_user
-    except ValidationError:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Invalid email format",
-        )
-    except IntegrityError as e:
-        db.rollback()
-        print(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database integrity error",
-        )
-    except SQLAlchemyError as e:
-        print(e)
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error"
-        )
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}",
-        )
-
-
-def get_user_by_username(db: Session, username: str) -> User:
-    try:
-        validate_email(username)
-        return db.query(User).filter(User.email == username).first()
-    except ValueError:
-        return db.query(User).filter(User.name == username).first()
-
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
 
 def verify_password(plain_password, hashed_password):
-    return bcrypt.checkpw(
-        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
-    )
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
 # User Register for an event API crud
@@ -203,3 +142,4 @@ def register_user_for_event(db: Session, user_id: int, event_id: int):
     db.commit()
     db.refresh(registration)
     return registration
+
