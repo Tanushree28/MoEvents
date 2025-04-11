@@ -5,6 +5,7 @@ import useApi from "../hooks/useApi";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/login.css";
 import logow from "../assets/logo.png";
+import Button from "./atoms/button";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -27,8 +28,8 @@ function Login() {
     try {
       const data = await fetchData({ username, password });
       if (data?.token) {
-        login(data.token); // <-- update context
-        navigate(from, { replace: true }); // <-- redirect
+        login(data.token);
+        navigate(from, { replace: true });
       } else {
         setErrorMessage("Authentication failed. Please try again.");
       }
@@ -65,11 +66,8 @@ function Login() {
             />
           </div>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
-          <div>
-            <button type="submit" className="form-submit" disabled={loading}>
-              {loading ? "Signing In..." : "Sign In"}
-            </button>
-          </div>
+
+          <Button variant="default" primaryText="Sign" fullWidth />
         </form>
         <p>
           Forgot Password? <a href="/forgot-password">Click Here</a>

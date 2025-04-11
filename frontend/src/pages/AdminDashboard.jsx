@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import "../styles/admindashboard.css";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/atoms/card";
 
 function AdminDashboard() {
   const [showCreateEventForm, setShowCreateEventForm] = useState(false);
@@ -185,23 +193,22 @@ function AdminDashboard() {
           </form>
         </div>
       )}
-
-      <main className="dashboard-main">
-        <section className="upcoming-events">
-          <h2>Upcoming Events This Week</h2>
-          <div className="event-scroll">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="event-card">
-                <h3>{event.title}</h3>
-                <p>
-                  <strong>Date:</strong> {event.date}
-                </p>
-                <p>{event.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
+      <h2>Upcoming Events This Week</h2>
+      <div className="event-scroll">
+        {upcomingEvents.map((event) => (
+          <Card>
+            <CardHeader>
+              <CardTitle>{event.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                <strong>Date:</strong> {event.date}
+              </p>
+              <p>{event.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       <footer className="dashboard-footer">
         <p>© 2025 MoEvents. All Rights Reserved.</p>
