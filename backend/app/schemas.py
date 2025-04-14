@@ -115,3 +115,10 @@ class UserRegisterEvent(BaseModel):
 
     class Config:
         from_attributes = True
+
+# Upcoming Events Schedule API schema :YYYY-MM-DD format
+class UpcomingEventsSchedule(BaseModel):
+    date: str
+
+    class Config:
+        from_attributes = True

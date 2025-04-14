@@ -205,6 +205,22 @@ def register_user_for_event(db: Session, user_id: int, event_id: int):
     db.refresh(registration)
     return registration
 
+# Upcoming Events Schedule 
+def get_upcoming_events(db: Session, date: str):
+    try:
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        events = db.query(Event).filter(Event.date >= date_obj).all()
+        return events
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format"
+        )
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching events: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error"
+        )
+    
 
 ################################
 ######## Token blacklist #######
