@@ -6,6 +6,7 @@ from pymysql import DatabaseError
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import bcrypt
+from sqlalchemy import func
 
 from backend.app.schemas import EventCreate, EventRead, EventUpdate, UserCreate
 from backend.app.models import Event, Registration, TokenBlacList
@@ -239,3 +240,39 @@ def prune_expired_jtis(db: Session):
         TokenBlacList.expires_at < datetime.now(timezone.utc)
     ).delete(synchronize_session=False)
     db.commit()
+
+################################
+######## Visulization Panel #######
+################################
+
+def count_upcoming_events(db: Session, date: str):
+    try:
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        count = db.query(Event).filter(Event.date >= date_obj).count()
+        return {"count": count}
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format")
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching events: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
+
+def count_registrations_per_event(db: Session):
+    try:
+        results = (
+            db.query(Event.title, func.count(Registration.registration_id).label("registration_count"))
+            .join(Registration, Event.event_id == Registration.event_id)
+            .group_by(Event.event_id, Event.title)
+            .all()
+        )
+        return {"data": [{"title": r[0], "registration_count": r[1]} for r in results]}
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching registrations: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
+
+def count_all_events(db: Session):
+    try:
+        count = db.query(Event).count()
+        return {"count": count}
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching total events: {e}")
+        raise HTTPException(status_code=500, detail="Database error")
