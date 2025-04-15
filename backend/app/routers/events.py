@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from .. import schemas, crud
 from ..database import get_db
-from backend.app.utils.dependencies import admin_required
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -11,9 +10,7 @@ router = APIRouter(prefix="/events", tags=["Events"])
 def create_event(
     event: schemas.EventCreate,
     db: Session = Depends(get_db),
-    # current_admin = Depends(admin_required)
 ):
-    # event.admin_id = current_admin.user_id
     return crud.create_event(db, event)
 
 

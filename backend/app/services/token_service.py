@@ -51,8 +51,7 @@ class TokenService:
         access_token = cls._create_access_token(
             data={
                 "sub": user.name,
-                "user_id": user.user_id
-                # "role": user.role,
+                "user_id": user.user_id,
             }
         )
         return access_token
@@ -87,9 +86,7 @@ class TokenService:
                     detail="Token has been invalidated.",
                 )
 
-            token_data = schemas.TokenData(
-                username=username)
-                # role=payload.get("role"))
+            token_data = schemas.TokenData(username=username)
         except jwt.PyJWKError:
             raise cls.__credentials_exception
 
