@@ -11,6 +11,7 @@ import "./App.css";
 import Login from "./components/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import { useAuth } from "./contexts/AuthContext";
+import SignUp from "./components/SignUp";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -47,6 +48,17 @@ function App() {
             <ProtectedRoute>
               <AdminDashboard />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : (
+              <SignUp />
+            )
           }
         />
 
