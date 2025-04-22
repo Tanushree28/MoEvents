@@ -88,8 +88,6 @@ def delete_event_by_id(db: Session, id: int) -> EventRead:
 
 
 # Registration CRUD operations
-
-
 def create_registration(db: Session, registration: RegistrationCreate):
     try:
         registration = Registration(
@@ -206,11 +204,16 @@ def register_user_for_event(db: Session, user_id: int, event_id: int):
     db.refresh(registration)
     return registration
 
-# Upcoming Events Schedule 
+# Upcoming Events Schedule also consider situation when given date has no events
 def get_upcoming_events(db: Session, date: str):
     try:
         date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-        events = db.query(Event).filter(Event.date >= date_obj).all()
+        print(f"-----------------Fetching events from date: {date_obj}")
+        events = db.query(Event).filter(Event.date == date_obj).distinct()
+        if not events:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No upcoming events found"
+            )
         return events
     except ValueError:
         raise HTTPException(
