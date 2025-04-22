@@ -1,4 +1,4 @@
-// src/App.js
+// src/App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -9,10 +9,12 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import Login from "./components/Login";
-import AdminDashboard from "./pages/AdminDashboard";
-import { useAuth } from "./contexts/AuthContext";
 import SignUp from "./components/SignUp";
+import AdminDashboard from "./pages/AdminDashboard";
+import StudentDashboard from "./pages/StudentDashboard"; // 👈 import student dashboard
+import { useAuth } from "./contexts/AuthContext";
 
+// 🔒 Route wrapper for admin
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
@@ -31,6 +33,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Login */}
         <Route
           path="/login"
           element={
@@ -42,15 +45,7 @@ function App() {
           }
         />
 
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Signup */}
         <Route
           path="/signup"
           element={
@@ -62,7 +57,21 @@ function App() {
           }
         />
 
-        <Route path="/" element={<h1>Hello World</h1>} />
+        {/* Admin Dashboard */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ✅ Student Dashboard route */}
+        <Route path="/student/dashboard" element={<StudentDashboard />} />
+
+        {/* Default Route */}
+        <Route path="/" element={<h1 className="text-center text-3xl mt-10">Welcome to MoEvents</h1>} />
       </Routes>
     </Router>
   );

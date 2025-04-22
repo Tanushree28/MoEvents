@@ -87,20 +87,44 @@ def delete_event_by_id(db: Session, id: int) -> EventRead:
         raise e
 
 
-# Registration CRUD operations
 def create_registration(db: Session, registration: RegistrationCreate):
     try:
-        registration = Registration(
+        # Check if event exists
+        event = db.query(Event).filter(Event.event_id == registration.event_id).first()
+        if not event:
+            raise ValueError(f"Event with ID {registration.event_id} does not exist.")
+
+        # Check if user exists
+        user = db.query(User).filter(User.user_id == registration.user_id).first()
+        if not user:
+            raise ValueError(f"User with ID {registration.user_id} does not exist.")
+
+        # Optional: Check if already registered
+        existing = db.query(Registration).filter(
+            Registration.event_id == registration.event_id,
+            Registration.user_id == registration.user_id
+        ).first()
+        if existing:
+            raise ValueError("User is already registered for this event.")
+
+        # Create the registration
+        reg = Registration(
             event_id=registration.event_id,
             user_id=registration.user_id,
         )
-        db.add(registration)
+        db.add(reg)
         db.commit()
-        db.refresh(registration)
+        db.refresh(reg)
 
-        return registration
+        return reg
+
+    except ValueError as ve:
+        logger.warning(f"Validation error: {ve}")
+        raise ve
+
     except DatabaseError as e:
-        logger.error(f"Error creating registration: {e}")
+        db.rollback()
+        logger.error(f"Database error creating registration: {e}")
         raise e
 
 
