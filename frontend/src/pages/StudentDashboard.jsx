@@ -6,6 +6,8 @@ import weekday from "dayjs/plugin/weekday";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
+import { useAuth } from '../contexts/AuthContext';
+
 dayjs.extend(isBetween);
 dayjs.extend(weekday);
 
@@ -13,6 +15,7 @@ const StudentDashboard = () => {
   const [allEvents, setAllEvents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [eventsOnSelectedDate, setEventsOnSelectedDate] = useState([]);
+  const { login} = useAuth();
 
   // Dummy user_id (you can replace this with actual logged-in user's ID later)
   const userId = 8;
