@@ -1,8 +1,7 @@
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, field_validator, validate_email
 from datetime import date as _date, time as _time
-from typing import Optional
-
+from typing import Optional, List
 
 class UserBase(BaseModel):
     username: str
@@ -44,6 +43,7 @@ class UserRead(UserBase):
 
 class TokenData(BaseModel):
     username: str | None = None
+    # role: str | None = None
 
 
 class LoginResponse(BaseModel):
@@ -115,3 +115,23 @@ class UserRegisterEvent(BaseModel):
 
     class Config:
         from_attributes = True
+
+# Upcoming Events Schedule API schema :YYYY-MM-DD format
+class UpcomingEventsSchedule(BaseModel):
+    date: str
+
+    class Config:
+        from_attributes = True
+
+class UpcomingEventCountResponse(BaseModel):
+    count: int
+
+class EventRegistrationCount(BaseModel):
+    title: str
+    registration_count: int
+
+class RegistrationsPerEventResponse(BaseModel):
+    data: List[EventRegistrationCount]
+
+class EventCountResponse(BaseModel):
+    count: int

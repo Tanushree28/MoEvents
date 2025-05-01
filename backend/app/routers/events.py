@@ -31,3 +31,8 @@ def update_event(id: int, event: schemas.EventUpdate, db: Session = Depends(get_
 @router.delete("/{id}", response_model=schemas.EventRead)
 def delete_event(id: int, db: Session = Depends(get_db)):
     return crud.delete_event_by_id(db, id)
+
+@router.get("/upcoming/{date}", response_model=list[schemas.EventRead])
+def get_upcoming_events(date: str, db: Session = Depends(get_db)):
+    return crud.get_upcoming_events(db, date)
+

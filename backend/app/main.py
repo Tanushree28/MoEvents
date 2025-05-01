@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import events, registrations, login
+from .routers import events, registrations, login, visualization
 from .database import engine
 from .models import Base
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,9 +15,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-
-
 # Include the events router
 app.include_router(login.router)
 app.include_router(events.router)
 app.include_router(registrations.router)
+app.include_router(visualization.router)

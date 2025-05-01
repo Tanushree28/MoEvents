@@ -1,0 +1,108 @@
+/* signup.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #3b3b3b;
+    background-color: #f0f0f0;
+    overflow-y: auto; /* Allow vertical scroll if needed */
+  }
+  
+  .auth-page {
+    background: url("../assets/background.jpg") no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+  }
+  
+  .signup-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .signup-container img {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    margin: 0 auto 15px auto;
+  }
+  
+  .signup-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .signup-container input[type="text"],
+  .signup-container input[type="email"],
+  .signup-container input[type="password"] {
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  
+  .signup-container input[type="submit"] {
+    background-color: #d71921;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 16px;
+    font-size: 16px;
+  }
+  
+  .signup-container input[type="submit"]:hover {
+    background-color: #c7161e;
+  }
+  
+  .signup-container a {
+    color: #d71921;
+    text-decoration: none;
+    font-size: 13px;
+  }
+  
+  .signup-container a:hover {
+    text-decoration: underline;
+  }
+  
+  .signup-footer {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #333;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+  }
+  
+  /* Error Message */
+  .error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: -5px;
+    margin-bottom: 10px;
+  }
+  
+  /* Responsive Design */
+  @media (max-height: 600px) {
+    .auth-page {
+      align-items: flex-start;
+      padding-top: 20px;
+    }
+  }
+  

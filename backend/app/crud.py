@@ -6,6 +6,7 @@ from pymysql import DatabaseError
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import bcrypt
+from sqlalchemy import func
 
 from backend.app.schemas import EventCreate, EventRead, EventUpdate, UserCreate
 from backend.app.models import Event, Registration, TokenBlacList
@@ -86,22 +87,44 @@ def delete_event_by_id(db: Session, id: int) -> EventRead:
         raise e
 
 
-# Registration CRUD operations
-
-
 def create_registration(db: Session, registration: RegistrationCreate):
     try:
-        registration = Registration(
+        # Check if event exists
+        event = db.query(Event).filter(Event.event_id == registration.event_id).first()
+        if not event:
+            raise ValueError(f"Event with ID {registration.event_id} does not exist.")
+
+        # Check if user exists
+        user = db.query(User).filter(User.user_id == registration.user_id).first()
+        if not user:
+            raise ValueError(f"User with ID {registration.user_id} does not exist.")
+
+        # Optional: Check if already registered
+        existing = db.query(Registration).filter(
+            Registration.event_id == registration.event_id,
+            Registration.user_id == registration.user_id
+        ).first()
+        if existing:
+            raise ValueError("User is already registered for this event.")
+
+        # Create the registration
+        reg = Registration(
             event_id=registration.event_id,
             user_id=registration.user_id,
         )
-        db.add(registration)
+        db.add(reg)
         db.commit()
-        db.refresh(registration)
+        db.refresh(reg)
 
-        return registration
+        return reg
+
+    except ValueError as ve:
+        logger.warning(f"Validation error: {ve}")
+        raise ve
+
     except DatabaseError as e:
-        logger.error(f"Error creating registration: {e}")
+        db.rollback()
+        logger.error(f"Database error creating registration: {e}")
         raise e
 
 
@@ -205,6 +228,26 @@ def register_user_for_event(db: Session, user_id: int, event_id: int):
     db.refresh(registration)
     return registration
 
+# Upcoming Events Schedule also consider situation when given date has no events
+def get_upcoming_events(db: Session, date: str):
+    try:
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        events = db.query(Event).filter(Event.date == date_obj).distinct()
+        if not events:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No upcoming events found"
+            )
+        return events
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format"
+        )
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching events: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error"
+        )
+    
 
 ################################
 ######## Token blacklist #######
@@ -223,3 +266,39 @@ def prune_expired_jtis(db: Session):
         TokenBlacList.expires_at < datetime.now(timezone.utc)
     ).delete(synchronize_session=False)
     db.commit()
+
+################################
+######## Visulization Panel #######
+################################
+
+def count_upcoming_events(db: Session, date: str):
+    try:
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        count = db.query(Event).filter(Event.date >= date_obj).count()
+        return {"count": count}
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format")
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching events: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
+
+def count_registrations_per_event(db: Session):
+    try:
+        results = (
+            db.query(Event.title, func.count(Registration.registration_id).label("registration_count"))
+            .join(Registration, Event.event_id == Registration.event_id)
+            .group_by(Event.event_id, Event.title)
+            .all()
+        )
+        return {"data": [{"title": r[0], "registration_count": r[1]} for r in results]}
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching registrations: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
+
+def count_all_events(db: Session):
+    try:
+        count = db.query(Event).count()
+        return {"count": count}
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching total events: {e}")
+        raise HTTPException(status_code=500, detail="Database error")

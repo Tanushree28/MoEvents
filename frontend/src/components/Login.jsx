@@ -67,7 +67,7 @@ function Login() {
           </div>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          <Button variant="default" primaryText="Sign" fullWidth />
+          <Button variant="default" primaryText="Sign In" fullWidth />
         </form>
         <p>
           Forgot Password? <a href="/forgot-password">Click Here</a>
