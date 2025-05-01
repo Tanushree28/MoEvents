@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext'; // ✅ Import AuthContext
+import { useAuth } from '../contexts/AuthContext';
 
 const AdminDashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -15,15 +15,15 @@ const AdminDashboard = () => {
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
 
-  const { logout } = useAuth(); // ✅ useAuth Hook
+  const { logout } = useAuth();
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     event_type: '',
     department: '',
-    date: '',
-    time: '',
+    date: '',            // YYYY-MM-DD
+    time: '',            // HH:mm or HH:mm:ss
     location: '',
     created_by: 1,
   });
@@ -39,7 +39,9 @@ const AdminDashboard = () => {
 
   const fetchEventCount = async () => {
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/visuals/event_count?date=${formatDate(selectedDate)}`);
+      const res = await axios.get(
+        `http://127.0.0.1:8000/visuals/event_count?date=${formatDate(selectedDate)}`
+      );
       setEventCount(res.data.count);
     } catch (err) {
       console.error('Event count error:', err);
@@ -66,7 +68,9 @@ const AdminDashboard = () => {
 
   const fetchEventsByDate = async () => {
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/events/upcoming/${formatDate(selectedDate)}`);
+      const res = await axios.get(
+        `http://127.0.0.1:8000/events/upcoming/${formatDate(selectedDate)}`
+      );
       setEventsOnSelectedDate(res.data);
     } catch (err) {
       console.log('No event found or error fetching by date');
@@ -75,12 +79,26 @@ const AdminDashboard = () => {
   };
 
   const handleCreateEvent = async () => {
+    if (!formData.date || !formData.time) {
+      return alert('Please select a date and time for the event');
+    }
+
+    // Ensure time has seconds
+    const timeValue =
+      formData.time.length === 5 ? `${formData.time}:00` : formData.time;
+
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      event_type: formData.event_type,
+      department: formData.department,
+      date: formData.date,
+      time: timeValue,
+      location: formData.location,
+      created_by: formData.created_by,
+    };
+
     try {
-      const payload = {
-        ...formData,
-        date: formatDate(selectedDate),
-        time: formData.time.length > 5 ? formData.time.substring(11, 19) : formData.time,
-      };
       await axios.post('http://127.0.0.1:8000/events/', payload);
       alert('Event created!');
       resetForm();
@@ -95,13 +113,29 @@ const AdminDashboard = () => {
 
   const handleUpdateEvent = async () => {
     if (!selectedEventId) return alert('Select event first');
+    if (!formData.date || !formData.time) {
+      return alert('Please select a date and time for the event');
+    }
+
+    const timeValue =
+      formData.time.length === 5 ? `${formData.time}:00` : formData.time;
+
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      event_type: formData.event_type,
+      department: formData.department,
+      date: formData.date,
+      time: timeValue,
+      location: formData.location,
+      created_by: formData.created_by,
+    };
+
     try {
-      const payload = {
-        ...formData,
-        date: formatDate(selectedDate),
-        time: formData.time.length > 5 ? formData.time.substring(11, 19) : formData.time,
-      };
-      await axios.put(`http://127.0.0.1:8000/events/${selectedEventId}`, payload);
+      await axios.put(
+        `http://127.0.0.1:8000/events/${selectedEventId}`,
+        payload
+      );
       alert('Event updated!');
       resetForm();
       fetchEventCount();
@@ -134,9 +168,9 @@ const AdminDashboard = () => {
       description: event.description,
       event_type: event.event_type,
       department: event.department,
+      date: event.date,
       time: event.time,
       location: event.location,
-      date: event.date,
       created_by: event.created_by,
     });
     setSelectedEventId(event.event_id);
@@ -182,13 +216,57 @@ const AdminDashboard = () => {
         <div className="bg-white shadow-md rounded-lg p-4 mb-6">
           <h2 className="text-lg font-semibold mb-4">Create New Event</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Event Type" value={formData.event_type} onChange={(e) => setFormData({ ...formData, event_type: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Department" value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="datetime-local" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <button onClick={handleCreateEvent} className="bg-yellow-600 text-white px-4 py-2 rounded-lg col-span-full">
+            <input
+              type="text"
+              placeholder="Title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="Event Type"
+              value={formData.event_type}
+              onChange={(e) => setFormData({ ...formData, event_type: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="Department"
+              value={formData.department}
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="time"
+              value={formData.time}
+              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="text"
+              placeholder="Location"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <button
+              onClick={handleCreateEvent}
+              className="bg-yellow-600 text-white px-4 py-2 rounded-lg col-span-full"
+            >
               Submit Event
             </button>
           </div>
@@ -200,12 +278,53 @@ const AdminDashboard = () => {
         <div className="bg-white shadow-md rounded-lg p-4 mb-6">
           <h2 className="text-lg font-semibold mb-4">Update Event</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Event Type" value={formData.event_type} onChange={(e) => setFormData({ ...formData, event_type: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Department" value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="datetime-local" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
-            <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="border border-gray-300 rounded px-3 py-2" />
+            <input 
+              type="text" 
+              placeholder="Title" 
+              value={formData.title} 
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })} 
+              className="border border-gray-300 rounded px-3 py-2" 
+            />
+            <input 
+              type="text" 
+              placeholder="Description" 
+              value={formData.description} 
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+              className="border border-gray-300 rounded px-3 py-2" 
+            />
+            <input 
+              type="text" 
+              placeholder="Event Type" 
+              value={formData.event_type} 
+              onChange={(e) => setFormData({ ...formData, event_type: e.target.value })} 
+              className="border border-gray-300 rounded px-3 py-2" 
+            />
+            <input 
+              type="text" 
+              placeholder="Department" 
+              value={formData.department} 
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })} 
+              className="border border-gray-300 rounded px-3 py-2" 
+            />
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input
+              type="time"
+              value={formData.time}
+              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2"
+            />
+            <input 
+              type="text" 
+              placeholder="Location" 
+              value={formData.location} 
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })} 
+              className="border border-gray-300 rounded px-3 py-2" 
+            />
             <button onClick={handleUpdateEvent} className="bg-yellow-600 text-white px-4 py-2 rounded-lg col-span-full">
               Submit Update
             </button>
