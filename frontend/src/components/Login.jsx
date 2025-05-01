@@ -1,11 +1,11 @@
-// src/components/Login.jsx
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useApi from "../hooks/useApi";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/login.css";
 import logow from "../assets/logo.png";
 import Button from "./atoms/button";
+import jwtDecode from "jwt-decode";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -13,13 +13,8 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
-  const location = useLocation();
   const { login } = useAuth();
-
-  const from = location.state?.from?.pathname || "/admin/dashboard";
-  const { fetchData, loading } = useApi("/auth/login", "post", {
-    immediate: false,
-  });
+  const { fetchData } = useApi("/auth/login", "post", { immediate: false });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +24,14 @@ function Login() {
       const data = await fetchData({ username, password });
       if (data?.token) {
         login(data.token);
-        navigate(from, { replace: true });
+        const decoded = jwtDecode(data.token); // Decode the token to get the role
+        if (decoded.role === "admin") {
+          navigate("/admin/dashboard", { replace: true });
+        } else if (decoded.role === "student") {
+          navigate("/student/dashboard", { replace: true });
+        } else {
+          setErrorMessage("Invalid role. Please contact support.");
+        }
       } else {
         setErrorMessage("Authentication failed. Please try again.");
       }

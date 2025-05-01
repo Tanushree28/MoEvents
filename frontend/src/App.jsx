@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -11,24 +10,26 @@ import "./App.css";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import AdminDashboard from "./pages/AdminDashboard";
-import StudentDashboard from "./pages/StudentDashboard"; // 👈 import student dashboard
+import StudentDashboard from "./pages/StudentDashboard";
 import { useAuth } from "./contexts/AuthContext";
 
-// 🔒 Route wrapper for admin
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+  const { isAuthenticated, role } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 };
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) return <div>Loading...</div>;
+  const { isAuthenticated, role } = useAuth();
 
   return (
     <Router>
@@ -38,7 +39,11 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate to="/admin/dashboard" replace />
+              role === "admin" ? (
+                <Navigate to="/admin/dashboard" replace />
+              ) : (
+                <Navigate to="/student/dashboard" replace />
+              )
             ) : (
               <Login />
             )
@@ -50,7 +55,11 @@ function App() {
           path="/signup"
           element={
             isAuthenticated ? (
-              <Navigate to="/admin/dashboard" replace />
+              role === "admin" ? (
+                <Navigate to="/admin/dashboard" replace />
+              ) : (
+                <Navigate to="/student/dashboard" replace />
+              )
             ) : (
               <SignUp />
             )
@@ -61,17 +70,27 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
         />
 
-        {/* ✅ Student Dashboard route */}
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
+        {/* Student Dashboard */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Default Route */}
-        <Route path="/" element={<h1 className="text-center text-3xl mt-10">Welcome to MoEvents</h1>} />
+        <Route
+          path="/"
+          element={<h1 className="text-center text-3xl mt-10">Welcome to MoEvents</h1>}
+        />
       </Routes>
     </Router>
   );
