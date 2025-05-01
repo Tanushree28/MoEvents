@@ -13,6 +13,7 @@ function SignUp() {
     email: "",
     password: "",
     verify_password: "",
+    role: ""
   });
 
   const [errorMessage, setErrorMessage] = useState("");

@@ -16,7 +16,9 @@ function Login() {
   const location = useLocation();
   const { login } = useAuth();
 
-  const from = location.state?.from?.pathname || "/admin/dashboard";
+  // no default to /admin here—just grab what they tried to access
+  const requestedPath = location.state?.from?.pathname;
+
   const { fetchData, loading } = useApi("/auth/login", "post", {
     immediate: false,
   });
@@ -27,9 +29,29 @@ function Login() {
 
     try {
       const data = await fetchData({ username, password });
-      if (data?.token) {
-        login(data.token);
-        navigate(from, { replace: true });
+      // Expect data = { token: string, type: "bearer", role: "admin"|"student" }
+      if (data?.token && data?.role) {
+        // 1) Store both token and role
+        login({
+          token: data.token,
+          role: data.role,
+        });
+
+        // 2) Decide where to go next:
+        //    a) If they tried accessing a protected route AND it matches their role, honor it
+        //    b) Otherwise send them to their dashboard
+        const rolePath =
+          data.role === "admin" ? "/admin/dashboard" : "/student/dashboard";
+
+        const redirectPath =
+          requestedPath &&
+          ((data.role === "admin" && requestedPath.startsWith("/admin")) ||
+            (data.role === "student" &&
+              requestedPath.startsWith("/student")))
+            ? requestedPath
+            : rolePath;
+
+        navigate(redirectPath, { replace: true });
       } else {
         setErrorMessage("Authentication failed. Please try again.");
       }

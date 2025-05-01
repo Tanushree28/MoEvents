@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from .. import schemas, crud
 from ..database import get_db
+from ..middleware import get_current_user, require_role
 
-router = APIRouter(prefix="/registration", tags=["Registrations"])
+router = APIRouter(prefix="/registration", tags=["Registrations"], dependencies=[Depends(require_role("student"))])
 
 @router.post("/", response_model=schemas.RegistrationCreate)
 def create_registration(

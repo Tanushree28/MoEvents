@@ -32,6 +32,7 @@ class UserLogin(BaseModel):
 class UserCreate(UserBase):
     password: str
     verify_password: str
+    role: str
 
 
 class UserRead(UserBase):
@@ -43,7 +44,8 @@ class UserRead(UserBase):
 
 class TokenData(BaseModel):
     username: str | None = None
-    # role: str | None = None
+    user_id: int | None = None       #--- add 
+    role: str | None = None            #--- add
 
 
 class LoginResponse(BaseModel):

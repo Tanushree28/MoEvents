@@ -174,7 +174,7 @@ def create_user(db: Session, user: UserCreate):
             name=user.username,
             password=hashed_password.decode("utf-8"),
             email=user.email,
-            role="student",
+            role=user.role,
         )
         db.add(db_user)
         db.commit()

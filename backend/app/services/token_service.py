@@ -52,6 +52,7 @@ class TokenService:
             data={
                 "sub": user.name,
                 "user_id": user.user_id,
+                "role": user.role.value,            # <— add this
             }
         )
         return access_token

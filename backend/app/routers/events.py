@@ -2,8 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from .. import schemas, crud
 from ..database import get_db
+from ..middleware import get_current_user, require_role
 
-router = APIRouter(prefix="/events", tags=["Events"])
+router = APIRouter(
+    prefix="/events", 
+    tags=["Events"],
+    dependencies=[Depends(require_role("admin"))])  # Only admin can access these routes
 
 
 @router.post("/", response_model=schemas.EventCreate)
